@@ -1,0 +1,67 @@
+notify:
+  - slack: "#apm-server"
+    if: build.state == "failed" && build.branch =~ /^(main|\d+\.\d+|\d+\.x)$$/
+  - slack: "#observablt-bots"
+    if: build.state == "failed" && build.branch =~ /^(main|\d+\.\d+|\d+\.x)$$/
+
+env:
+  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2404"
+  IMAGE_UBUNTU_ARM_64: "core-ubuntu-2404-aarch64"
+  GENERATE_WOLFI_IMAGES: true
+  GENERATE_FIPS_ARTIFACTS: true
+
+steps:
+  - group: "Package"
+    key: "package"
+    steps:
+      - label: "Package x86_64"
+        key: "package-x86-64"
+        command: ".buildkite/scripts/package.sh {{matrix}}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c4d-standard-16"
+          diskType: "hyperdisk-balanced"
+        matrix:
+          - "snapshot"
+          - "staging"
+        artifact_paths:
+          - "build/distributions/**/*"
+          - "build/dependencies*.csv"
+        timeout_in_minutes: 120
+        retry:
+          automatic:
+            - limit: 1
+
+      - label: "Package aarch64"
+        key: "package-arm"
+        command: ".buildkite/scripts/package.sh {{matrix}}"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "c8g.2xlarge"
+        matrix:
+          - "snapshot"
+          - "staging"
+        artifact_paths:
+          - "build/distributions/**/*"
+        timeout_in_minutes: 120
+        retry:
+          automatic:
+            - limit: 1
+
+  - label: ":pipeline: Generate DRA steps ({{matrix}})"
+    key: "dra-step-generator"
+    command: ".buildkite/scripts/dra.sh {{matrix}}"
+    agents:
+      provider: "gcp"
+      image: "${IMAGE_UBUNTU_X86_64}"
+      machineType: "c4d-standard-16"
+      diskType: "hyperdisk-balanced"
+    matrix:
+      - "snapshot"
+      - "staging"
+    timeout_in_minutes: 10
+    depends_on:
+      - step: "package"
+        allow_failure: false

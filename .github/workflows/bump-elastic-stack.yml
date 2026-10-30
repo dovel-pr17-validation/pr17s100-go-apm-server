@@ -1,0 +1,56 @@
+---
+name: bump-elastic-stack-snapshot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 15 * * 1-5'
+
+permissions:
+  contents: read
+
+jobs:
+  filter:
+    runs-on: ubuntu-slim
+    timeout-minutes: 1
+    outputs:
+      matrix: ${{ steps.generator.outputs.matrix }}
+    steps:
+      - id: generator
+        uses: elastic/oblt-actions/elastic/active-branches@v1
+        with:
+          filter-branches: true
+
+  bump-elastic-stack:
+    runs-on: ubuntu-latest
+    needs: [filter]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Get token
+        id: get_token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.OBS_AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.OBS_AUTOMATION_APP_PEM }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - uses: elastic/oblt-actions/updatecli/run@v1
+        with:
+          command: --experimental apply --config .ci/updatecli/bump-elastic-stack-snapshot.yml --values .ci/updatecli/values.d/scm.yml
+        env:
+          BRANCH: ${{ matrix.branch }}
+          GITHUB_TOKEN: ${{ steps.get_token.outputs.token }}
+
+      - if: ${{ failure()  }}
+        uses: elastic/oblt-actions/slack/send@v1
+        with:
+          channel-id: '#apm-server'
+          message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @robots-ci please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+          bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

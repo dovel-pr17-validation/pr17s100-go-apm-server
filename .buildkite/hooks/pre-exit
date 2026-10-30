@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+##
+##  Cleanup the created env variables on the fly.
+##
+
+if command -v docker &>/dev/null; then
+  docker logout $DOCKER_REGISTRY_SECRET
+  docker logout $DOCKERHUB_REGISTRY_SECRET
+fi

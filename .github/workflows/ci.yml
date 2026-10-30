@@ -1,0 +1,205 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+      - 7.1*
+      - 8.*
+      - 9.*
+    paths-ignore: # When updating the list of expressions also update ci-docs.yml
+      - '**.md'
+      - '**.asciidoc'
+      - '**.png'
+      - '**.svg'
+  pull_request:
+    paths-ignore: # When updating the list of expressions also update ci-docs.yml
+      - '**.md'
+      - '**.asciidoc'
+      - '**.png'
+      - '**.svg'
+  merge_group:
+
+# limit the access of the generated GITHUB_TOKEN
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/go/pkg/mod/cache
+          key: go-${{ hashFiles('go.mod') }}
+          restore-keys: |
+            go-
+      - run: make check-full
+
+  test:
+    strategy:
+      matrix:
+        os: ['macos-latest', 'ubuntu-latest', 'windows-2025']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: actions/cache/restore@v6
+        with:
+          enableCrossOsArchive: true
+          path: |
+            ~/go/pkg/mod/cache
+          key: go-${{ hashFiles('go.mod') }}
+          restore-keys: |
+            go-
+      - run: make test
+
+  test-integration-server-internal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: integrationservertest/go.mod
+          cache: false
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/go/pkg/mod/cache
+          key: integrationservertest-go-${{ hashFiles('integrationservertest/go.mod') }}
+          restore-keys: |
+            integration-server-test-go-
+      - env:
+          KIBANA_URL: "https://kibana.test"
+          KIBANA_USERNAME: "dummy"
+          KIBANA_PASSWORD: "dummy"
+          EC_URL: "https://elastic-cloud.test"
+          EC_API_KEY: "dummy"
+          EC_REGION: "gcp-us-west2"
+        # run integrationservertest/internal tests
+        # integrationservertest themselves are run in the integration-server-test pipeline
+        run: cd ./integrationservertest && go test -v -race ./internal/...
+
+  test-fips:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/go/pkg/mod/cache
+          key: go-${{ hashFiles('go.mod') }}
+          restore-keys: |
+            go-
+      - env:
+          GOTAGS: "requirefips"
+          GOFIPS140: "latest"
+          GODEBUG: "fips140=only"
+        run: make test
+
+  system-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: systemtest/go.mod
+          cache: false
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/go/pkg/mod/cache
+          key: systemtest-go-${{ hashFiles('systemtest/go.mod', 'go.mod') }}
+          restore-keys: |
+            systemtest-go-
+      - env:
+          NOCP: "1"
+          GOOS: "linux"
+          GOARCH: "amd64"
+        run: |
+            docker compose up -d &
+            make apm-server &
+            wait
+      - env:
+          GOTESTFLAGS: "-v"
+          GH_TOKEN: ${{ github.token }}
+        run: make system-test
+
+  system-test-fips:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: systemtest/go.mod
+          cache: false
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/go/pkg/mod/cache
+          key: systemtest-go-${{ hashFiles('systemtest/go.mod', 'go.mod') }}
+          restore-keys: |
+            systemtest-go-
+      - env:
+          NOCP: "1"
+          GOOS: "linux"
+          GOARCH: "amd64"
+        run: |
+            docker compose up -d &
+            make apm-server &
+            wait
+      - env:
+          GOTESTFLAGS: "-v"
+          GOTAGS: "requirefips"
+          GOFIPS140: "latest"
+          GODEBUG: "fips140=only"
+          GH_TOKEN: ${{ github.token }}
+        run: make system-test
+
+  test-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+      - run: make package-snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  test-package-and-push:
+    runs-on: ubuntu-latest
+    # If no PR event or if a PR event that's caused by a non-fork and non dependabot actor
+    if: github.event_name != 'pull_request' || ( github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]' )
+    env:
+      GENERATE_WOLFI_IMAGES: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Log in to the Elastic Container registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ${{ secrets.ELASTIC_DOCKER_REGISTRY }}
+          username: ${{ secrets.ELASTIC_DOCKER_USERNAME }}
+          password: ${{ secrets.ELASTIC_DOCKER_PASSWORD }}
+      - run: make package-snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: make publish-docker-images

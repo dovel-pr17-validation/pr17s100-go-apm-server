@@ -1,0 +1,42 @@
+---
+name: Bump beats
+pipelineid: 'updatecli-update-beats-{{ requiredEnv "BRANCH_NAME" }}'
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      branch: '{{ requiredEnv "BRANCH_NAME" }}'
+      commitusingapi: true
+      force: false
+
+actions:
+  default:
+    title: '[updatecli][{{ requiredEnv "BRANCH_NAME" }}] Update to elastic/beats'
+    kind: github/pullrequest
+    scmid: default
+    spec:
+      automerge: false
+      labels:
+        - automation
+        - backport-skip
+      description: |-
+        ### What
+        `elastic/beats@{{ requiredEnv "BRANCH_NAME" }}` automatic sync
+
+targets:
+  beats:
+    name: 'update-beats with {{ requiredEnv "BRANCH_NAME" }}'
+    scmid: default
+    kind: shell
+    disablesourceinput: true
+    spec:
+      command: .ci/scripts/update-beats.sh '{{ requiredEnv "BRANCH_NAME" }}'
+      environments:
+        - name: PATH
+        - name: HOME

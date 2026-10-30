@@ -1,0 +1,136 @@
+---
+navigation_title: "Deprecations"
+applies_to:
+  stack: ga
+---
+
+# Elastic APM deprecations
+Over time, certain Elastic functionality becomes outdated and is replaced or removed. To help with the transition, Elastic deprecates functionality for a period before removal, giving you time to update your applications.
+
+Review the deprecated functionality for Elastic APM. While deprecations have no immediate impact, we strongly encourage you update your implementation after you upgrade. To learn how to upgrade, check out [Upgrade](docs-content://deploy-manage/upgrade.md).
+
+## Next version [next-version]
+
+% ::::{dropdown} Deprecation title
+% Description of the deprecation.
+% For more information, check [PR #](PR link).
+% **Impact**<br> Impact of deprecation.
+% **Action**<br> Steps for mitigating deprecation impact.
+% ::::
+
+% ## 9.5.0 [9-5-0]
+
+% Commenting 9.5.0 release notes until it is released
+% _No deprecations_ 
+
+% ## 9.4.0 [9-4-0]
+
+% _No deprecations_ 
+
+## 9.3.0 [9-3-0]
+
+_No deprecations_ 
+
+## 9.2.4 [9-2-4]
+
+_No deprecations_
+
+## 9.2.3 [9-2-3]
+
+_No deprecations_
+
+## 9.2.2 [9-2-2]
+
+_No deprecations_
+
+## 9.2.1 [9-2-1]
+
+_No deprecations_
+
+## 9.2.0 [9-2-0]
+
+_No deprecations_
+
+## 9.1.10 [9-1-10]
+
+_No deprecations_
+
+## 9.1.9 [9-1-9]
+
+_No deprecations_
+
+## 9.1.8 [9-1-8]
+
+_No deprecations_
+
+## 9.1.7 [9-1-7]
+
+_No deprecations_
+
+## 9.1.6 [9-1-6]
+
+_No deprecations_
+
+## 9.1.5 [9-1-5]
+
+_No deprecations_
+
+## 9.1.4 [9-1-4]
+
+_No deprecations_
+
+## 9.1.3 [9-1-3]
+
+_No deprecations_
+
+## 9.1.2 [9-1-2]
+
+_No deprecations_
+
+## 9.1.1 [9-1-1]
+
+_No deprecations_
+
+## 9.1.0 [9-1-0]
+
+_No deprecations_
+
+## 9.0.8 [9-0-8]
+
+_No deprecations_
+
+## 9.0.7 [9-0-7]
+
+_No deprecations_
+
+## 9.0.6 [9-0-6]
+
+_No deprecations_
+
+## 9.0.5 [9-0-5]
+
+_No deprecations_
+
+## 9.2.0 [9-2-0]
+
+_No deprecations_ 
+
+## 9.0.4 [9-0-4]
+
+_No deprecations_
+
+## 9.0.3 [9-0-3]
+
+_No deprecations_
+
+## 9.0.2 [9-0-2]
+
+_No deprecations_
+
+## 9.0.1 [9-0-1]
+
+_No deprecations_
+
+## 9.0.0 [9-0-0]
+
+_No deprecations_

@@ -1,0 +1,75 @@
+---
+# Dependabot Pull Requests are not updating the NOTICE.txt file, which causes the lint job to fail.
+# This workflow will checkout the dependabot PR, update the NOTICE.txt file, and push the changes back to the PR.
+name: update-dependabot-pr
+
+on:
+  push:
+    branches:
+      - dependabot/go_modules/**
+    paths-ignore:
+      - NOTICE.txt
+      - NOTICE-fips.txt
+
+permissions:
+  contents: read
+
+jobs:
+  update-dependabot-pr:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      # TokenPolicy defined at https://github.com/elastic/catalog-info/tree/main/resources/github-token-policies/token-policy-apm-server-update-dependabot.yaml
+      - name: Get token
+        id: get_token
+        uses: elastic/oblt-actions/github/create-token@v1
+
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ steps.get_token.outputs.token }}
+
+      - name: Configure git user
+        uses: elastic/oblt-actions/git/setup@v1
+        with:
+          github-token: ${{ steps.get_token.outputs.token }}
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd  # v7.0.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Update NOTICE.txt
+        run: make notice
+
+      - name: Debug diff
+        run: git status --porcelain
+
+      - name: Check if NOTICE.txt has changed
+        id: check-notice-diff
+        run: |
+          if git status --porcelain | grep -q 'NOTICE.txt\|NOTICE-fips.txt'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Debug output
+        run: |-
+          echo 'changed: ${{ steps.check-notice-diff.outputs.changed }}'
+
+      - name: Commit changes (signed)
+        if: ${{ steps.check-notice-diff.outputs.changed == 'true' }}
+        run: |
+          git add NOTICE.txt NOTICE-fips.txt
+          git commit -m "Update NOTICE.txt and NOTICE-fips.txt"
+          git push

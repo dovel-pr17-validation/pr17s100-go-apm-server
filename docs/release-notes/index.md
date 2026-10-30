@@ -1,0 +1,330 @@
+---
+navigation_title: "Elastic APM"
+mapped_pages:
+  - https://www.elastic.co/guide/en/observability/current/apm-release-notes.html
+  - https://www.elastic.co/guide/en/observability/master/release-notes-head.html
+applies_to:
+  stack: ga
+---
+
+# Elastic APM release notes
+
+Review the changes, fixes, and more in each version of Elastic APM.
+
+To check for security updates, go to [Security announcements for the Elastic stack](https://discuss.elastic.co/c/announcements/security-announcements/31).
+
+% Release notes include only features, enhancements, and fixes. Add breaking changes, deprecations, and known issues to the applicable release notes sections.
+% For each new version section, include the Elastic APM and Kibana changes.
+
+% ## Next version [apm-next-release-notes]
+
+% ### Features and enhancements [apm-next-features-enhancements]
+% * 1 sentence describing the change. ([#PR number](https://github.com/elastic/apm-server/pull/PR number))
+
+% ### Fixes [apm-next-fixes]
+% * 1 sentence describing the change. ([#PR number](https://github.com/elastic/apm-server/pull/PR number))
+
+## 9.5.5 [apm-9.5.5-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.5.4 [apm-9.5.4-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.5.3 [apm-9.5.3-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.5.2 [apm-9.5.2-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.5.1 [apm-9.5.1-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.5.0 [apm-9.5.0-release-notes]
+
+### Fixes [apm-9.5.0-fixes]
+
+* Skip loading and applying source maps that exceed the configured `max_sourcemap_size` limit (default 500MiB) to prevent excessive memory usage. ([#21520](https://github.com/elastic/apm-server/pull/21520))
+
+## 9.4.8 [apm-9.4.8-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.4.7 [apm-9.4.7-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.4.6 [apm-9.4.6-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.4.5 [apm-9.4.5-release-notes]
+
+### Fixes [apm-9.4.5-fixes]
+
+* Skip loading and applying source maps that exceed the configured `max_sourcemap_size` limit (default 500MiB) to prevent excessive memory usage. ([#21520](https://github.com/elastic/apm-server/pull/21520))
+
+## 9.4.4 [apm-9.4.4-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.4.3 [apm-9.4.3-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.4.2 [apm-9.4.2-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.4.1 [apm-9.4.1-release-notes]
+
+### Fixes [apm-9.4.1-fixes]
+
+* Bound Tail-Based Sampling memory usage when reading sampled trace events by implementing paging ([#20881](https://github.com/elastic/apm-server/pull/20881))
+
+## 9.4.0 [apm-9.4.0-release-notes]
+
+### Features and enhancements [apm-9.4.0-features-enhancements]
+
+* Report APM Server status on major health issues ([#20166](https://github.com/elastic/apm-server/pull/20166))
+
+### Fixes [apm-9.4.0-fixes]
+
+* Fixed HTTP/2 connections being dropped by strict clients and browser-based RUM agents due to APM Server sending inconsistent SETTINGS frames at connection start. ([#20913](https://github.com/elastic/apm-server/pull/20913)). For more details, refer to our known issues [page](https://www.elastic.co/docs/release-notes/apm/known-issues)
+
+## 9.3.8 [apm-9.3.8-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.3.7 [apm-9.3.7-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.3.6 [apm-9.3.6-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.3.5 [apm-9.3.5-release-notes]
+
+### Fixes [apm-9.3.5-fixes]
+
+* Bound Tail-Based Sampling memory usage when reading sampled trace events by implementing paging ([#20881](https://github.com/elastic/apm-server/pull/20881))
+
+## 9.3.4 [apm-9.3.4-release-notes]
+
+### Fixes [apm-9.3.4-fixes]
+
+* Fixed HTTP/2 connections being dropped by strict clients and browser-based RUM agents due to APM Server sending inconsistent SETTINGS frames at connection start. ([#20913](https://github.com/elastic/apm-server/pull/20913)). For more details, refer to our known issues [page](https://www.elastic.co/docs/release-notes/apm/known-issues)
+
+## 9.3.3 [apm-9.3.3-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.3.2 [apm-9.3.2-release-notes]
+
+### Features and enhancements [apm-9.3.2-features-enhancements]
+
+* Add new storage and disk metrics for Tail Based Sampling ([#20478](https://github.com/elastic/apm-server/pull/20478))
+
+### Fixes [apm-9.3.2-fixes]
+
+* Fix `timestamp.us` explicit mapping ([#elasticsearch/143593](https://github.com/elastic/elasticsearch/pull/143593))
+
+## 9.3.1 [apm-9.3.1-release-notes]
+
+### Fixes [apm-9.3.1-fixes]
+
+* Fix potential data race in Tail Based Sampling ([#20140](https://github.com/elastic/apm-server/pull/20140))
+* Fix self-instrumentation missing span kind in some traces ([#20210](https://github.com/elastic/apm-server/pull/20210)) ([#20213](https://github.com/elastic/apm-server/pull/20213))
+
+## 9.3.0 [apm-9.3.0-release-notes]
+
+% ### Features and enhancements [apm-9.3.0-features-enhancements]
+% * 1 sentence describing the change. ([#PR number](https://github.com/elastic/apm-server/pull/PR number))
+
+_No new features or enhancements_ 
+
+% ### Fixes [apm-9.3.0-fixes]
+% * 1 sentence describing the change. ([#PR number](https://github.com/elastic/apm-server/pull/PR number))
+
+_No new fixes_ 
+
+## 9.2.8 [apm-9.2.8-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.2.7 [apm-9.2.7-release-notes]
+
+### Features and enhancements [apm-9.2.7-features-enhancements]
+
+* Add new storage and disk metrics for Tail Based Sampling ([#20477](https://github.com/elastic/apm-server/pull/20477))
+
+### Fixes [apm-9.2.7-fixes]
+
+* Fix `timestamp.us` explicit mapping ([#elasticsearch/143594](https://github.com/elastic/elasticsearch/pull/143594))
+
+## 9.2.6 [apm-9.2.6-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.2.5 [apm-9.2.5-release-notes]
+
+### Fixes [apm-9.2.5-fixes]
+
+* Fix potential data race in Tail Based Sampling ([#20139](https://github.com/elastic/apm-server/pull/20139))
+* Fix self-instrumentation missing span kind in some traces ([#20199](https://github.com/elastic/apm-server/pull/20199)) ([#20212](https://github.com/elastic/apm-server/pull/20212))
+
+## 9.2.4 [apm-9.2.4-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.2.3 [apm-9.2.3-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.2.2 [apm-9.2.2-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.2.1 [apm-9.2.1-release-notes]
+
+### Fixes [apm-9.2.1-fixes]
+
+* Fix build pipeline to ensure resulting binary info shows `vcs.modified=false` ([#19252](https://github.com/elastic/apm-server/pull/19252))
+
+## 9.2.0 [apm-9.2.0-release-notes]
+
+### Features and enhancements [apm-9.2.0-features-enhancements]
+
+* [Failure store](https://www.elastic.co/docs/manage-data/data-store/data-streams/failure-store) enabled for all new datastreams. This is applied through [elasticsearch#131296](https://github.com/elastic/elasticsearch/pull/131296) and [elasticsearch#131395](https://github.com/elastic/elasticsearch/pull/131395)
+
+### Fixes [apm-9.2.0-fixes]
+
+* Fix `output.elasticsearch.bulk_requests.available` metric to correctly report the available bulk indexers [#18953](https://github.com/elastic/apm-server/pull/18953)
+
+## 9.1.10 [apm-9.1.10-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.1.9 [apm-9.1.9-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.1.8 [apm-9.1.8-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.1.7 [apm-9.1.7-release-notes]
+
+### Fixes [apm-9.1.7-fixes]
+
+* Fix build pipeline to ensure resulting binary info shows `vcs.modified=false` ([#19252](https://github.com/elastic/apm-server/pull/19252))
+
+## 9.1.6 [apm-9.1.6-release-notes]
+
+### Fixes [apm-9.1.6-fixes]
+
+* Fix `output.elasticsearch.bulk_requests.available` metric to correctly report the available bulk indexers [#18953](https://github.com/elastic/apm-server/pull/18953)
+
+## 9.1.5 [apm-9.1.5-release-notes]
+
+### Fixes [apm-9.1.5-fixes]
+
+* APM Integration on ECH or ECE uses recommended frozen values for infrastructure related configs. The fix is applied through [kibana#235306](https://github.com/elastic/kibana/pull/235306)
+
+## 9.1.4 [apm-9.1.4-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.1.3 [apm-9.1.3-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.1.2 [apm-9.1.2-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.1.1 [apm-9.1.1-release-notes]
+
+### Fixes [apm-9.1.1-fixes]
+
+* Fix Fleet-managed apm-server hanging or crashing on config hot reload due to duplicate monitoring registry ([#17872](https://github.com/elastic/apm-server/pull/17872))
+
+## 9.1.0 [apm-9.1.0-release-notes]
+
+### Features and enhancements [apm-9.1.0-features-enhancements]
+
+* Add config for tail-based sampling discard on write ([#13950](https://github.com/elastic/integrations/pull/13950))
+* Add config for tail-based sampling TTL ([#16579](https://github.com/elastic/apm-server/pull/16579))
+
+### Fixes [apm-9.1.0-fixes]
+
+* Truncate string slice attributes in OTLP labels ([#434](https://github.com/elastic/apm-data/pull/434))
+* Fix broken UI by explicitly enabling date detection for the `system.process.cpu.start_time` field ([#130466](https://github.com/elastic/elasticsearch/pull/130466))
+* Use representative count for the `event.success_count` metric if available ([#119995](https://github.com/elastic/elasticsearch/pull/119995))
+* Fix setting `event.dataset` to `data_stream.dataset` if `event.dataset` is empty, to have `event.dataset` in every `logs-*` data stream ([#129074](https://github.com/elastic/elasticsearch/pull/129074))
+* Fix missing trusted root certificate authority in the docker image ([#16928](https://github.com/elastic/apm-server/pull/16928))
+
+## 9.0.8 [apm-9.0.8-release-notes]
+
+### Fixes [apm-9.0.8-fixes]
+
+* APM Integration on ECH or ECE uses recommended frozen values for infrastructure related configs. The fix is applied through [kibana#235306](https://github.com/elastic/kibana/pull/235306).
+
+## 9.0.7 [apm-9.0.7-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.0.6 [apm-9.0.6-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.0.5 [apm-9.0.5-release-notes]
+
+_No new features, enhancements, or fixes._
+
+## 9.0.4 [apm-9.0.4-release-notes]
+
+### Fixes [apm-9.0.4-fixes]
+
+* Tail-based sampling: Fix missing or infrequent monitoring metric `lsm_size` and `value_log_size` ([#17512](https://github.com/elastic/apm-server/pull/17512))
+* Fix default tracer `http request sent to https endpoint` error when both self-instrumentation and TLS are enabled ([#17293](https://github.com/elastic/apm-server/pull/17293))
+
+## 9.0.3 [apm-9.0.3-release-notes]
+
+### Features and enhancements [apm-9.0.3-features-enhancements]
+
+* Tail-based sampling: Optimize performance for instances with more CPU and memory ([#17254](https://github.com/elastic/apm-server/pull/17254))
+
+### Fixes [apm-9.0.3-fixes]
+
+* Tail-based sampling: Fix ever-increasing dynamic group count monitoring metric ([#17042](https://github.com/elastic/apm-server/pull/17042))
+* Tail-based sampling: Fix incorrectly large pebble database `lsm_size` monitoring metric in edge cases which causes TBS to be bypassed ([#17149](https://github.com/elastic/apm-server/pull/17149))
+* Tail-based sampling: Log pubsub errors at error or warn level ([#17135](https://github.com/elastic/apm-server/pull/17135))
+
+## 9.0.2 [apm-9.0.2-release-notes]
+
+### Fixes [apm-9.0.2-fixes]
+
+* Fix missing trusted root certificate authority in the docker image ([#16928](https://github.com/elastic/apm-server/pull/16928))
+
+## 9.0.1 [apm-9.0.1-release-notes]
+
+### Fixes [apm-9.0.1-fixes]
+
+* Tail-based sampling: ignore subscriber position read error and proceed as if file does not exist to avoid crash looping ([#16736](https://github.com/elastic/apm-server/pull/16736))
+
+## 9.0.0 [9-0-0]
+
+### Features and enhancements [9-0-0-features-enhancements]
+
+* **Tail-based sampling**: Storage layer is rewritten to use Pebble database instead of BadgerDB. The new implementation offers a substantial throughput increase while consuming significantly less memory. Disk usage is significantly lower and more stable. See APM [Transaction sampling](docs-content://solutions/observability/apm/transaction-sampling.md) docs for benchmark details. ([#15235](https://github.com/elastic/apm-server/pull/15235))
+
+### Fixes [9-0-0-fixes]
+
+* Fix overflow in validation of `apm-server.agent.config.cache.expiration` on 32-bit architectures. ([#15216](https://github.com/elastic/apm-server/pull/15216))
+* Change permissions of `apm-server.yml` in `tar.gz` artifacts to `0600`. ([#15627](https://github.com/elastic/apm-server/pull/15627))

@@ -1,0 +1,28 @@
+name: Add new issues to the team project board
+
+on:
+  issues:
+    types:
+      - opened
+      - transferred
+
+permissions:
+  contents: read
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get token
+        id: get_token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.OBS_AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.OBS_AUTOMATION_APP_PEM }}
+          permission-organization-projects: write
+          permission-issues: read
+      - uses: actions/add-to-project@5afcf98fcd03f1c2f92c3c83f58ae24323cc57fd # v2.0.0
+        with:
+          project-url: https://github.com/orgs/elastic/projects/1286
+          github-token: ${{ steps.get_token.outputs.token }}

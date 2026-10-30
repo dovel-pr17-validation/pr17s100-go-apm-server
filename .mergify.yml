@@ -1,0 +1,376 @@
+commands_restrictions:
+  backport:
+    conditions:
+      - or:
+          - sender-permission>=write
+          - sender=github-actions[bot]
+queue_rules:
+  - name: default
+    merge_method: squash
+    merge_conditions:
+      - check-success=test (macos-latest)
+      - or:
+          - check-success=test (windows-2025)
+          - check-success=test (windows-latest)
+      - check-success=system-test
+      - check-success=lint
+      - check-success=CLA
+defaults:
+  actions:
+    backport:
+      title: "[{{ destination_branch }}] (backport #{{ number }}) {{ title }}"
+      assignees:
+        - "{{ author }}"
+      labels:
+        - "backport"
+pull_request_rules:
+  - name: ask to resolve conflict
+    conditions:
+      - conflict
+    actions:
+      comment:
+        message: |
+          This pull request is now in conflicts. Could you fix it @{{author}}? 🙏
+          To fixup this pull request, you can check out it locally. See documentation: https://help.github.com/articles/checking-out-pull-requests-locally/
+          ```
+          git fetch upstream
+          git checkout -b {{head}} upstream/{{head}}
+          git merge upstream/{{base}}
+          git push upstream {{head}}
+          ```
+  - name: backport patches to 8.4 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.4
+    actions:
+      backport:
+        branches:
+          - "8.4"
+  - name: backport patches to 8.3 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.3
+    actions:
+      backport:
+        branches:
+          - "8.3"
+  - name: backport patches to 8.2 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.2
+    actions:
+      backport:
+        branches:
+          - "8.2"
+  - name: backport patches to 8.1 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.1
+    actions:
+      backport:
+        branches:
+          - "8.1"
+  - name: backport patches to 8.0 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.0
+    actions:
+      backport:
+        branches:
+          - "8.0"
+  - name: backport patches to 7.17 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-7.17
+    actions:
+      backport:
+        branches:
+          - "7.17"
+  - name: backport patches to 7.16 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-7.16
+    actions:
+      backport:
+        branches:
+          - "7.16"
+  - name: backport patches to 7.15 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-7.15
+    actions:
+      backport:
+        branches:
+          - "7.15"
+  - name: backport patches to 7.14 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-7.14
+    actions:
+      backport:
+        branches:
+          - "7.14"
+  - name: backport patches to 7.13 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-7.13
+    actions:
+      backport:
+        branches:
+          - "7.13"
+  - name: squash and merge updatecli PRs after CI passes
+    conditions:
+      - label=automation
+      - head~=^updatecli
+      - -conflict
+    actions:
+      queue:
+        name: default
+  - name: notify the backport policy
+    conditions:
+      - -label~=^backport
+      - base=main
+    actions:
+      comment:
+        message: |
+          This pull request does not have a backport label. Could you fix it @{{author}}? 🙏
+          To fixup this pull request, you need to add the backport labels for the needed
+          branches, such as:
+          * `backport-8.19` is the label to automatically backport to the 8.19 branch.
+          * `backport-9./d` is the label to automatically backport to the `9./d` branch. `/d` is the digit.
+          * `backport-active-all` is the label that automatically backports to all active branches.
+          * `backport-active-9` is the label that automatically backports to all active minor branches for the 9 major.
+  - name: remove backport-skip label
+    conditions:
+      - label~=^backport-\d
+    actions:
+      label:
+        remove:
+          - backport-skip
+  - name: notify the backport has not been merged yet
+    conditions:
+      - -merged
+      - -closed
+      - author=mergify[bot]
+      - "#check-success>0"
+      - schedule=Mon-Mon 06:00-10:00[Europe/Paris]
+    actions:
+      comment:
+        message: |
+          This pull request has not been merged yet. Could you please review and merge it @{{ assignee | join(', @') }}? 🙏
+  - name: squash and merge backport PRs after CI passes
+    conditions:
+      - label=backport
+      - author=mergify[bot]
+      - -conflict
+    actions:
+      queue:
+        name: default
+  - name: backport patches to 8.5 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.5
+    actions:
+      backport:
+        branches:
+          - "8.5"
+  - name: backport patches to 8.6 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.6
+    actions:
+      backport:
+        branches:
+          - "8.6"
+  - name: backport patches to 8.7 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.7
+    actions:
+      backport:
+        branches:
+          - "8.7"
+  - name: backport patches to 8.8 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.8
+    actions:
+      backport:
+        branches:
+          - "8.8"
+  - name: backport patches to 8.9 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.9
+    actions:
+      backport:
+        branches:
+          - "8.9"
+  - name: backport patches to 8.10 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.10
+    actions:
+      backport:
+        branches:
+          - "8.10"
+  - name: backport patches to 8.11 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.11
+    actions:
+      backport:
+        branches:
+          - "8.11"
+  - name: backport patches to 8.12 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.12
+    actions:
+      backport:
+        branches:
+          - "8.12"
+  - name: backport patches to 8.13 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.13
+    actions:
+      backport:
+        branches:
+          - "8.13"
+  - name: backport patches to 8.14 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.14
+    actions:
+      backport:
+        branches:
+          - "8.14"
+  - name: backport patches to 8.15 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.15
+    actions:
+      backport:
+        branches:
+          - "8.15"
+  - name: backport patches to 8.16 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.16
+    actions:
+      backport:
+        branches:
+          - "8.16"
+  - name: backport patches to 8.17 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.17
+    actions:
+      backport:
+        branches:
+          - "8.17"
+  - name: backport patches to 8.18 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.18
+    actions:
+      backport:
+        branches:
+          - "8.18"
+  - name: backport patches to 8.19 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-8.19
+    actions:
+      backport:
+        branches:
+          - "8.19"
+  - name: backport patches to 9.0 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-9.0
+    actions:
+      backport:
+        branches:
+          - "9.0"
+  - name: backport patches to 9.1 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-9.1
+    actions:
+      backport:
+        branches:
+          - "9.1"
+  - name: backport patches to 9.2 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-9.2
+    actions:
+      backport:
+        branches:
+          - "9.2"
+  - name: backport patches to 9.3 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-9.3
+    actions:
+      backport:
+        branches:
+          - "9.3"
+  - name: backport patches to 9.4 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-9.4
+    actions:
+      backport:
+        branches:
+          - "9.4"
+  - name: backport patches to 9.5 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-9.5
+    actions:
+      backport:
+        branches:
+          - "9.5"
+  - name: backport patches to 9.6 branch
+    conditions:
+      - merged
+      - base=main
+      - label=backport-9.6
+    actions:
+      backport:
+        branches:
+          - "9.6"

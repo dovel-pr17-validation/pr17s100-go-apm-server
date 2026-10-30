@@ -1,0 +1,1 @@
+./8GBx1zone-gcp.tfvars

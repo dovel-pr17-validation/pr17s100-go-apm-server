@@ -1,0 +1,4 @@
+*.auto.tfvars
+response.txt
+secret_token_value.json
+scripts/

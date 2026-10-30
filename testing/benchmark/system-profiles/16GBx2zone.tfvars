@@ -1,0 +1,1 @@
+./16GBx2zone-gcp.tfvars

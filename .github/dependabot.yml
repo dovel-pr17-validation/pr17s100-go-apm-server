@@ -1,0 +1,118 @@
+version: 2
+registries:
+  docker-elastic:
+    type: docker-registry
+    url: https://docker.elastic.co
+    username: ${{secrets.ELASTIC_DOCKER_USERNAME}}
+    password: ${{secrets.ELASTIC_DOCKER_PASSWORD}}
+
+updates:
+  # go dependencies
+  - package-ecosystem: "gomod"
+    directory: "/"
+    ignore:
+      - dependency-name: "github.com/elastic/beats/v7"
+    schedule:
+      interval: "daily"
+    labels:
+      - "backport-active-9"
+    groups:
+      otel:
+        patterns:
+        - "go.opentelemetry.io/*"
+        - "github.com/jaegertracing/jaeger"
+        - "github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/jaeger"
+      spf13:
+        patterns:
+        - "github.com/spf13/*"
+      golang.org/x/:
+        patterns:
+        - "golang.org/x/*"
+      go-agent:
+        patterns:
+        - "go.elastic.co/apm*"
+  # go systemtest
+  - package-ecosystem: "gomod"
+    directory: "systemtest/"
+    schedule:
+      interval: "weekly"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+  # docker
+  - package-ecosystem: "docker"
+    directory: "/packaging/docker/"
+    registries: "*"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "backport-active-9"
+    groups:
+      docker:
+        patterns:
+          - "*"
+  # GitHub actions
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/"
+      - "/.github/workflows/*"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "22:00"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+  # go dependencies 8.x branch
+  - package-ecosystem: "gomod"
+    target-branch: "8.19"
+    directory: "/"
+    ignore:
+      - dependency-name: "github.com/elastic/beats/v7"
+    schedule:
+      interval: "weekly"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+  # docker 8.x branch
+  - package-ecosystem: "docker"
+    target-branch: "8.19"
+    registries: "*"
+    directory: "/packaging/docker/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # Stay on ubuntu:24.04 tag but bump digests.
+      - dependency-name: "ubuntu"
+        versions: ["> 24.04"]
+    groups:
+      docker:
+        patterns:
+          - "*"
+  # GitHub actions 8.x branch
+  - package-ecosystem: "github-actions"
+    target-branch: "8.19"
+    directories:
+      - "/"
+      - "/.github/workflows/*"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "22:00"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: pre-commit
+    directory: "/"
+    schedule:
+      interval: 'weekly'
+      day: 'sunday'
+      time: '22:00'
+    open-pull-requests-limit: 5
+    labels:
+      - 'changelog:dependencies'

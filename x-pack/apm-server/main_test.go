@@ -1,0 +1,86 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License 2.0;
+// you may not use this file except in compliance with the Elastic License 2.0.
+
+package main
+
+// This file is mandatory as otherwise the apm-server.test binary is not generated correctly.
+
+import (
+	"context"
+	"errors"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
+
+	"github.com/elastic/apm-data/model/modelpb"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/elastic-agent-libs/paths"
+
+	"github.com/elastic/apm-server/internal/beater"
+	"github.com/elastic/apm-server/internal/beater/config"
+	"github.com/elastic/apm-server/internal/beater/monitoringtest"
+	"github.com/elastic/apm-server/internal/elasticsearch"
+)
+
+func TestMainMonitoring(t *testing.T) {
+	home := t.TempDir()
+	beatPaths := paths.New()
+	require.NoError(t, beatPaths.InitPaths(&paths.Path{Home: home}))
+	defer closeDB() // close DB so data dir can be deleted on Windows
+
+	cfg := config.DefaultConfig()
+	cfg.Sampling.Tail.Enabled = true
+	cfg.Sampling.Tail.Policies = []config.TailSamplingPolicy{{SampleRate: 0.1}}
+	// MaxServices, MaxGroups, and ReadBatchMemoryLimit are configured
+	// based on memory limit. Overriding here to avoid validation errors.
+	cfg.Aggregation.MaxServices = 10000
+	cfg.Aggregation.Transactions.MaxGroups = 10000
+	cfg.Aggregation.ServiceTransactions.MaxGroups = 10000
+	cfg.Aggregation.ServiceDestinations.MaxGroups = 10000
+	cfg.Sampling.Tail.ReadBatchMemoryLimit = 10 << 20
+
+	reader := sdkmetric.NewManualReader(sdkmetric.WithTemporalitySelector(
+		func(ik sdkmetric.InstrumentKind) metricdata.Temporality {
+			return metricdata.DeltaTemporality
+		},
+	))
+	mp := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
+
+	// Wrap & run the server twice, to ensure metric registration does not panic.
+	runServerError := errors.New("runServer")
+	runServerFunc := func(ctx context.Context, args beater.ServerParams) error {
+		// run server for some time until storage metrics are reported by the storage manager
+		assert.EventuallyWithT(t, func(c *assert.CollectT) {
+			monitoringtest.ExpectContainOtelMetricsKeys(c, reader, []string{
+				"apm-server.sampling.tail.storage.lsm_size",
+				"apm-server.sampling.tail.storage.value_log_size",
+				"apm-server.sampling.tail.storage.storage_limit",
+				"apm-server.sampling.tail.storage.disk_used",
+				"apm-server.sampling.tail.storage.disk_total",
+				"apm-server.sampling.tail.storage.disk_usage_threshold_pct",
+			})
+		}, 2*time.Second, 20*time.Millisecond) // waitFor has to be greater than diskUsageFetchInterval
+
+		return runServerError
+	}
+	for range 2 {
+		serverParams, runServer, err := wrapServer(beater.ServerParams{
+			Config:                 cfg,
+			Paths:                  beatPaths,
+			Logger:                 logptest.NewTestingLogger(t, ""),
+			MeterProvider:          mp,
+			BatchProcessor:         modelpb.ProcessBatchFunc(func(ctx context.Context, b *modelpb.Batch) error { return nil }),
+			Namespace:              "default",
+			NewElasticsearchClient: elasticsearch.NewClient,
+		}, runServerFunc)
+		require.NoError(t, err)
+
+		err = runServer(context.Background(), serverParams)
+		assert.Equal(t, runServerError, err)
+	}
+}

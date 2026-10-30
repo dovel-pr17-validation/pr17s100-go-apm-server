@@ -1,0 +1,1 @@
+./32GBx2zone-gcp.tfvars
